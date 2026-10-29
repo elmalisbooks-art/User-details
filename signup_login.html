@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Sign Up & Login</title>
+  <style>
+    :root {
+      --green: #087f45;
+      --green-dark: #045b32;
+      --green-light: #e8f8ef;
+      --white: #ffffff;
+      --text: #153326;
+      --muted: #617369;
+      --danger: #b42318;
+      --shadow: 0 18px 50px rgba(0, 45, 22, .18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 14px;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      color: var(--text);
+      background: radial-gradient(circle at top left, #21b76c 0, transparent 36%),
+                  linear-gradient(135deg, #075b35, #0c9b54);
+    }
+    .app { width: min(100%, 520px); }
+    .brand { text-align: center; color: white; margin-bottom: 18px; }
+    .brand-mark {
+      display: inline-grid; place-items: center; width: 58px; height: 58px;
+      border-radius: 18px; background: rgba(255,255,255,.17);
+      border: 1px solid rgba(255,255,255,.32); font-size: 28px; margin-bottom: 10px;
+    }
+    .brand h1 { margin: 0; font-size: clamp(24px, 6vw, 32px); letter-spacing: .4px; }
+    .brand p { margin: 8px 0 0; font-size: 13px; opacity: .88; }
+    .panel {
+      background: var(--white); border-radius: 22px; padding: clamp(22px, 5vw, 34px);
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.65);
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 25px; }
+    .intro { margin: 0 0 23px; color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 600; }
+    .field { margin-bottom: 17px; }
+    label { display: block; font-size: 13px; margin-bottom: 8px; }
+    input {
+      width: 100%; min-height: 49px; border: 1.5px solid #d5e4da; border-radius: 12px;
+      padding: 13px 14px; font: 600 15px Arial, sans-serif; color: var(--text);
+      background: #fbfefc; outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(8,127,69,.11); }
+    input::placeholder { color: #91a197; font-weight: 500; }
+    .hint { display: block; margin-top: 7px; font-size: 11px; color: var(--muted); font-weight: 600; }
+    .btn {
+      width: 100%; min-height: 51px; border: 0; border-radius: 12px; padding: 14px;
+      background: var(--green); color: white; font: 800 15px Arial, sans-serif;
+      letter-spacing: .5px; cursor: pointer; transition: transform .15s, background .2s;
+    }
+    .btn:hover { background: var(--green-dark); }
+    .btn:active { transform: scale(.99); }
+    .btn.secondary { background: #e7f5ec; color: var(--green-dark); border: 1px solid #c6e8d3; }
+    .btn.secondary:hover { background: #d6efdf; }
+    .switch { text-align: center; margin: 18px 0 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+    .text-btn { border: 0; background: none; color: var(--green); font: 800 13px Arial, sans-serif; cursor: pointer; padding: 4px; }
+    .message { display: none; padding: 11px 12px; border-radius: 10px; margin: 0 0 16px; font-size: 13px; line-height: 1.45; }
+    .message.error { display: block; background: #fff0ef; color: var(--danger); }
+    .message.success { display: block; background: var(--green-light); color: var(--green-dark); }
+    .hidden { display: none !important; }
+    .welcome {
+      border-radius: 15px; background: var(--green-light); padding: 18px; margin: 18px 0 22px;
+    }
+    .welcome h3 { margin: 0 0 7px; font-size: 23px; color: var(--green-dark); }
+    .welcome p { margin: 0; font-size: 13px; line-height: 1.5; color: #426452; font-weight: 600; }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 22px 0 12px; }
+    .section-title h3 { margin: 0; font-size: 17px; }
+    .count { font-size: 12px; background: #e5f6eb; color: var(--green-dark); padding: 6px 10px; border-radius: 99px; white-space: nowrap; }
+    .member-list { display: grid; gap: 10px; }
+    .member {
+      border: 1px solid #e1ece5; border-radius: 13px; padding: 14px;
+      display: grid; grid-template-columns: 42px 1fr; gap: 12px; align-items: center;
+    }
+    .avatar { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: #dff4e7; color: var(--green-dark); font-size: 17px; }
+    .member strong { display: block; font-size: 14px; overflow-wrap: anywhere; }
+    .member small { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+    .empty { padding: 22px 14px; border: 1px dashed #cbded1; border-radius: 13px; color: var(--muted); text-align: center; font-size: 13px; }
+    .actions { display: grid; gap: 10px; margin-top: 22px; }
+    .footer { color: rgba(255,255,255,.82); text-align: center; font-size: 11px; font-weight: 600; margin-top: 17px; line-height: 1.5; }
+    @media (max-width: 380px) { .panel { padding: 20px 16px; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true">✓</div>
+      <h1>MEMBER PORTAL</h1>
+      <p>A simple place to join and connect</p>
+    </header>
+
+    <section class="panel" id="signupPage">
+      <h2>Create your account</h2>
+      <p class="intro">Enter your details below to sign up and access the members page.</p>
+      <div id="signupMessage" class="message" role="alert" aria-live="polite"></div>
+      <form id="signupForm" novalidate>
+        <div class="field">
+          <label for="realName">REAL NAME</label>
+          <input id="realName" name="realName" type="text" placeholder="Enter your real name"
+                 autocomplete="name" required pattern="[A-Za-z]+(?:[ '-][A-Za-z]+)*" maxlength="60">
+          <span class="hint">Letters only. Spaces, apostrophes and hyphens are allowed between names.</span>
+        </div>
+        <div class="field">
+          <label for="phone">WHATSAPP NUMBER / YOUR NUMBER</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" placeholder="07XXXXXXXX or 01XXXXXXXX"
+                 autocomplete="tel" required maxlength="10" pattern="(?:07|01)[0-9]{8}">
+          <span class="hint">Exactly 10 digits and must start with 07 or 01.</span>
+        </div>
+        <div class="field">
+          <label for="signupPassword">PASSWORD</label>
+          <input id="signupPassword" name="password" type="password" placeholder="Create a password"
+                 autocomplete="new-password" required minlength="4" maxlength="10">
+          <span class="hint">4–10 characters. Letters, numbers and symbols are allowed.</span>
+        </div>
+        <button class="btn" type="submit">SIGN UP</button>
+      </form>
+      <p class="switch">Already registered? <button class="text-btn" type="button" id="showLogin">LOG IN</button></p>
+    </section>
+
+    <section class="panel hidden" id="loginPage">
+      <h2>Welcome back</h2>
+      <p class="intro">Enter the password you used when signing up.</p>
+      <div id="loginMessage" class="message" role="alert" aria-live="polite"></div>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="loginPassword">YOUR PASSWORD</label>
+          <input id="loginPassword" type="password" placeholder="Enter your password"
+                 autocomplete="current-password" required minlength="4" maxlength="10">
+        </div>
+        <button class="btn" type="submit">LOG IN</button>
+      </form>
+      <p class="switch">New here? <button class="text-btn" type="button" id="showSignup">CREATE ACCOUNT</button></p>
+    </section>
+
+    <section class="panel hidden" id="membersPage">
+      <h2>Members dashboard</h2>
+      <div class="welcome">
+        <h3 id="welcomeName">WELCOME!</h3>
+        <p>You are logged in successfully. Here are the registered members.</p>
+      </div>
+      <div id="membersMessage" class="message" role="status" aria-live="polite"></div>
+      <div class="section-title">
+        <h3>Registered members</h3>
+        <span class="count" id="memberCount">0 members</span>
+      </div>
+      <div class="member-list" id="memberList"></div>
+      <div class="actions">
+        <button class="btn secondary" id="refreshMembers" type="button">REFRESH MEMBER LIST</button>
+        <button class="btn" id="logoutButton" type="button">LOG OUT</button>
+      </div>
+    </section>
+
+    <p class="footer">DEMO VERSION · Do not use real or sensitive passwords.<br>Browser-only storage is not a secure account system.</p>
+  </main>
+
+  <script>
+    /*
+      Frontend demonstration only.
+      Accounts are saved in this browser's localStorage. This is not secure for production:
+      passwords are not protected by a server and other people using this browser may inspect data.
+      Use a backend, secure password hashing, and proper sessions for a real website.
+    */
+    const USERS_KEY = "memberPortalUsersDemo";
+    const SESSION_KEY = "memberPortalCurrentUserDemo";
+
+    const pages = {
+      signup: document.getElementById("signupPage"),
+      login: document.getElementById("loginPage"),
+      members: document.getElementById("membersPage")
+    };
+
+    function readUsers() {
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+        return Array.isArray(users) ? users : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function showPage(pageName) {
+      Object.entries(pages).forEach(([name, element]) => {
+        element.classList.toggle("hidden", name !== pageName);
+      });
+      clearMessages();
+    }
+
+    function setMessage(id, text, type = "error") {
+      const element = document.getElementById(id);
+      element.textContent = text;
+      element.className = "message " + type;
+    }
+
+    function clearMessages() {
+      document.querySelectorAll(".message").forEach(element => {
+        element.textContent = "";
+        element.className = "message";
+      });
+    }
+
+    function validName(name) {
+      // Letters only, with optional spaces, apostrophes or hyphens between name parts.
+      return /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/.test(name);
+    }
+
+    function validPhone(phone) {
+      return /^(07|01)[0-9]{8}$/.test(phone);
+    }
+
+    document.getElementById("realName").addEventListener("input", event => {
+      // Do not silently remove characters; validation explains what needs correction.
+      event.target.setCustomValidity("");
+    });
+
+    document.getElementById("phone").addEventListener("input", event => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", event => {
+      event.preventDefault();
+      clearMessages();
+
+      const name = document.getElementById("realName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("signupPassword").value;
+
+      if (!validName(name)) {
+        setMessage("signupMessage", "Enter a real name using letters only. Spaces, apostrophes or hyphens may separate names.");
+        document.getElementById("realName").focus();
+        return;
+      }
+      if (!validPhone(phone)) {
+        setMessage("signupMessage", "Enter exactly 10 digits, starting with 07 or 01.");
+        document.getElementById("phone").focus();
+        return;
+      }
+      if (password.length < 4 || password.length > 10) {
+        setMessage("signupMessage", "Your password must contain 4 to 10 characters.");
+        document.getElementById("signupPassword").focus();
+        return;
+      }
+
+      const users = readUsers();
+      if (users.some(user => user.phone === phone)) {
+        setMessage("signupMessage", "This phone number is already registered. Please log in instead.");
+        return;
+      }
+
+      users.push({
+        id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+        name,
+        phone,
+        password,
+        createdAt: new Date().toISOString()
+      });
+
+      try {
+        saveUsers(users);
+      } catch {
+        setMessage("signupMessage", "Could not save your account in this browser. Check available storage and try again.");
+        return;
+      }
+
+      sessionStorage.setItem(SESSION_KEY, phone);
+      document.getElementById("signupForm").reset();
+      showDashboard(phone);
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", event => {
+      event.preventDefault();
+      clearMessages();
+      const password = document.getElementById("loginPassword").value;
+      const users = readUsers();
+      const user = users.find(item => item.password === password);
+
+      if (!user) {
+        setMessage("loginMessage", "Incorrect password, or no account matches that password. Try again.");
+        return;
+      }
+
+      sessionStorage.setItem(SESSION_KEY, user.phone);
+      document.getElementById("loginForm").reset();
+      showDashboard(user.phone);
+    });
+
+    function showDashboard(phone) {
+      const user = readUsers().find(item => item.phone === phone);
+      if (!user) {
+        sessionStorage.removeItem(SESSION_KEY);
+        showPage("login");
+        setMessage("loginMessage", "Your account could not be found. Please log in again.");
+        return;
+      }
+      document.getElementById("welcomeName").textContent = "WELCOME, " + user.name.toUpperCase() + "!";
+      renderMembers();
+      showPage("members");
+    }
+
+    function renderMembers() {
+      const users = readUsers();
+      const list = document.getElementById("memberList");
+      list.replaceChildren();
+      document.getElementById("memberCount").textContent =
+        users.length + (users.length === 1 ? " member" : " members");
+
+      if (users.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No members have registered yet.";
+        list.appendChild(empty);
+        return;
+      }
+
+      users.forEach(user => {
+        const card = document.createElement("article");
+        card.className = "member";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = (user.name || "?").charAt(0).toUpperCase();
+        avatar.setAttribute("aria-hidden", "true");
+
+        const details = document.createElement("div");
+        const name = document.createElement("strong");
+        name.textContent = user.name;
+        const phone = document.createElement("small");
+        phone.textContent = "WhatsApp: " + user.phone;
+        details.append(name, phone);
+        card.append(avatar, details);
+        list.appendChild(card);
+      });
+    }
+
+    document.getElementById("showLogin").addEventListener("click", () => showPage("login"));
+    document.getElementById("showSignup").addEventListener("click", () => showPage("signup"));
+    document.getElementById("refreshMembers").addEventListener("click", renderMembers);
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem(SESSION_KEY);
+      showPage("login");
+    });
+
+    // Start on the sign-up screen. A refreshed tab may return to the active session.
+    const activePhone = sessionStorage.getItem(SESSION_KEY);
+    if (activePhone && readUsers().some(user => user.phone === activePhone)) {
+      showDashboard(activePhone);
+    } else {
+      showPage("signup");
+    }
+  </script>
+</body>
+</html>
